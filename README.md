@@ -1,2 +1,2 @@
 # missed-trades-page
-miss setup
+Strona do zapisywania missed setupów , pamięć strony jest lokalna przechowywana w przeglądarce
