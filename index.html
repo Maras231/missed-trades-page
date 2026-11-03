@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missed Setups Journal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="header-left">
+            <button id="backBtn" class="btn-secondary" style="display: none;">Powrot do miesiecy</button>
+            <h1 id="appTitle">Missed Setups Journal</h1>
+        </div>
+        <div class="header-right" style="display: flex; gap: 12px; align-items: center;">
+            <div class="stats" id="statsCount">Wybierz miesiac</div>
+            <button id="addMonthBtn" class="btn-secondary">+ Dodaj miesiac</button>
+        </div>
+    </header>
+
+    <!-- WIDOK 1: Kafelki miesiecy -->
+    <div id="monthsView" class="months-grid">
+        <!-- Generowane dynamicznie przez JS -->
+    </div>
+
+    <!-- WIDOK 2: Panel konkretnego miesiaca (Formularz + Lista) -->
+    <div id="monthDetailView" class="grid-layout" style="display: none;">
+        <div class="card form-card">
+            <form id="setupForm">
+                <div class="form-group">
+                    <label for="asset">Asset</label>
+                    <input type="text" id="asset">
+                </div>
+
+                <div class="form-group">
+                    <label>Zrzuty ekranu wykresu (Zrób screena a potem ctrl + v)</label>
+                    <div class="paste-zone" id="pasteZone">
+            
+                    </div>
+                    <div id="previewContainer" class="preview-container" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Notatki</label>
+                    <textarea id="notes" placeholder="Opisz kontekst rynkowy, poziom..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary">Zapisz w tym miesiacu</button>
+            </form>
+        </div>
+
+        <div class="entries-list" id="entriesList">
+            <!-- Tutaj wpadaja wpisy z wybranego miesiaca -->
+        </div>
+    </div>
+</div>
+
+<!-- Custom Modal do dodawania miesiąca -->
+<div class="custom-modal-overlay" id="addMonthModal">
+    <div class="custom-modal-card">
+        <h3>Dodaj nowy miesiac</h3>
+        <p>Wprowadz nazwe nowego okresu (np. Luty 2027):</p>
+        <input type="text" id="newMonthInput" placeholder="np. Luty 2027">
+        <div class="custom-modal-actions">
+            <button type="button" class="btn-secondary" id="cancelMonthBtn">Anuluj</button>
+            <button type="button" class="btn-primary" id="confirmMonthBtn">Dodaj</button>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Modal potwierdzenia usunięcia miesiąca -->
+<div class="custom-modal-overlay" id="deleteMonthModal">
+    <div class="custom-modal-card">
+        <h3>Usun miesiac</h3>
+        <p id="deleteMonthText">Czy na pewno chcesz usunac ten miesiac wraz ze wszystkimi wpisami?</p>
+        <div class="custom-modal-actions">
+            <button type="button" class="btn-secondary" id="cancelDeleteMonthBtn">Anuluj</button>
+            <button type="button" class="btn-primary" id="confirmDeleteMonthBtn" style="background-color: var(--danger); color: white;">Usun</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal podgladu zdjecia -->
+<div class="modal" id="imageModal">
+    <img id="modalImg" src="" alt="Powiekszenie wykresu">
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
