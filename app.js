@@ -18,6 +18,9 @@ const statsCount = document.getElementById('statsCount');
 const pasteZone = document.getElementById('pasteZone');
 const previewContainer = document.getElementById('previewContainer');
 const setupForm = document.getElementById('setupForm');
+const editingIdInput = document.getElementById('editingId');
+const submitBtn = document.getElementById('submitBtn');
+const cancelEditBtn = document.getElementById('cancelEditBtn');
 const entriesList = document.getElementById('entriesList');
 const modal = document.getElementById('imageModal');
 const modalImg = document.getElementById('modalImg');
@@ -126,6 +129,7 @@ window.removeImage = function(index) {
     renderPreviews();
 }
 
+// Obsługa formularza (Dodawanie lub Edycja)
 setupForm.addEventListener('submit', e => {
     e.preventDefault();
     if (!currentMonth) return;
@@ -134,26 +138,71 @@ setupForm.addEventListener('submit', e => {
         entries[currentMonth] = [];
     }
 
-    const newEntry = {
-        id: Date.now(),
-        asset: document.getElementById('asset').value.toUpperCase(),
-        notes: document.getElementById('notes').value,
-        images: [...currentImages],
-        date: new Date().toLocaleDateString('pl-PL') + ' ' + new Date().toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'})
-    };
+    const editId = editingIdInput.value;
+    const assetVal = document.getElementById('asset').value.toUpperCase();
+    const notesVal = document.getElementById('notes').value;
 
-    entries[currentMonth].unshift(newEntry);
+    if (editId) {
+        // Tryb edycji istniejącego wpisu
+        const entryIndex = entries[currentMonth].findIndex(item => item.id == editId);
+        if (entryIndex !== -1) {
+            entries[currentMonth][entryIndex].asset = assetVal;
+            entries[currentMonth][entryIndex].notes = notesVal;
+            entries[currentMonth][entryIndex].images = [...currentImages];
+        }
+        resetForm();
+    } else {
+        // Tryb dodawania nowego wpisu
+        const newEntry = {
+            id: Date.now(),
+            asset: assetVal,
+            notes: notesVal,
+            images: [...currentImages],
+            date: new Date().toLocaleDateString('pl-PL') + ' ' + new Date().toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'})
+        };
+        entries[currentMonth].unshift(newEntry);
+        resetForm();
+    }
+
     saveAndRenderMonth();
+});
 
+function editEntry(id) {
+    const monthData = entries[currentMonth] || [];
+    const item = monthData.find(i => i.id == id);
+    if (!item) return;
+
+    editingIdInput.value = item.id;
+    document.getElementById('asset').value = item.asset;
+    document.getElementById('notes').value = item.notes || '';
+    currentImages = item.images ? [...item.images] : (item.image ? [item.image] : []);
+    
+    renderPreviews();
+    submitBtn.innerText = 'Zaktualizuj wpis';
+    cancelEditBtn.style.display = 'inline-block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+cancelEditBtn.addEventListener('click', () => {
+    resetForm();
+});
+
+function resetForm() {
     setupForm.reset();
+    editingIdInput.value = '';
     currentImages = [];
     renderPreviews();
     pasteZone.style.display = 'block';
-});
+    submitBtn.innerText = 'Zapisz w tym miesiacu';
+    cancelEditBtn.style.display = 'none';
+}
 
 function deleteEntry(id) {
     if (!currentMonth) return;
     entries[currentMonth] = entries[currentMonth].filter(item => item.id !== id);
+    if (editingIdInput.value == id) {
+        resetForm();
+    }
     saveAndRenderMonth();
 }
 
@@ -172,6 +221,7 @@ function openMonth(monthId) {
     addMonthBtn.style.display = 'none';
     appTitle.innerText = `${monthObj ? monthObj.name : monthId}`;
 
+    resetForm();
     renderMonthView();
 }
 
@@ -183,6 +233,7 @@ function closeMonth() {
     addMonthBtn.style.display = 'inline-block';
     appTitle.innerText = `Missed Setups Journal`;
     statsCount.innerText = 'Wybierz miesiac';
+    resetForm();
     renderMonthsGrid();
 }
 
@@ -204,7 +255,7 @@ function renderMonthsGrid() {
 
     document.querySelectorAll('.delete-month-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Zapobiega otwarciu miesiąca przy kliknięciu 'x'
+            e.stopPropagation();
             const id = e.currentTarget.getAttribute('data-id');
             const name = e.currentTarget.getAttribute('data-name');
             promptDeleteMonth(id, name);
@@ -234,8 +285,13 @@ function renderMonthView() {
                 <div class="entry-info">
                     <div class="entry-header">
                         <span class="entry-asset">${item.asset}</span>
-                        <span class="entry-date">${item.date}</span>
-                        <button class="delete-btn" data-id="${item.id}" title="Usun wpis">x</button>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="entry-date">${item.date}</span>
+                            <div class="entry-actions">
+                                <button class="action-btn edit" data-id="${item.id}" title="Edytuj wpis">✎</button>
+                                <button class="action-btn delete" data-id="${item.id}" title="Usun wpis">x</button>
+                            </div>
+                        </div>
                     </div>
                     <div class="entry-desc">${item.notes ? escapeHtml(item.notes) : '<i>Brak dodatkowych notatek.</i>'}</div>
                 </div>
@@ -243,10 +299,17 @@ function renderMonthView() {
         `;
     }).join('');
 
-    document.querySelectorAll('.delete-btn').forEach(btn => {
+    document.querySelectorAll('.action-btn.delete').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const id = Number(e.currentTarget.getAttribute('data-id'));
             deleteEntry(id);
+        });
+    });
+
+    document.querySelectorAll('.action-btn.edit').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = Number(e.currentTarget.getAttribute('data-id'));
+            editEntry(id);
         });
     });
 
