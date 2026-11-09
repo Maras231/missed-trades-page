@@ -15,12 +15,18 @@
             <h1 id="appTitle">Missed Setups Journal</h1>
         </div>
         <div class="header-right" style="display: flex; gap: 12px; align-items: center;">
+            <!-- Nawigacja zakładek -->
+            <div class="tabs-nav" id="tabsNav" style="display: flex; gap: 6px;">
+                <button class="btn-secondary active-tab" id="tabJournalBtn">Missed setups</button>
+                <button class="btn-secondary" id="tabFrameworksBtn">Framework's</button>
+            </div>
             <div class="stats" id="statsCount">Wybierz miesiac</div>
             <button id="addMonthBtn" class="btn-secondary">+ Dodaj miesiac</button>
+            <button id="addFrameworkBtn" class="btn-secondary" style="display: none;">+ Dodaj Framework</button>
         </div>
     </header>
 
-    <!-- WIDOK 1: Kafelki miesiecy -->
+    <!-- WIDOK 1: Kafelki miesiecy (Dziennik) -->
     <div id="monthsView" class="months-grid">
         <!-- Generowane dynamicznie przez JS -->
     </div>
@@ -31,14 +37,14 @@
             <form id="setupForm">
                 <input type="hidden" id="editingId" value="">
                 <div class="form-group">
-                    <label for="asset">Asset</label>
+                    <label for="asset">Instrument / Rynek</label>
                     <input type="text" id="asset" placeholder="np. MNQ / EURUSD / SOL" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Zrzuty ekranu wykresu (zrób screena i Wcisnij Ctrl + V)</label>
+                    <label>Zrzuty ekranu wykresu (Wcisnij Ctrl + V - dowolna ilosc)</label>
                     <div class="paste-zone" id="pasteZone">
-                        
+                        Kliknij tutaj, a nastepnie wklej screeny (Ctrl+V)
                     </div>
                     <div id="previewContainer" class="preview-container" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;"></div>
                 </div>
@@ -57,6 +63,33 @@
 
         <div class="entries-list" id="entriesList">
             <!-- Tutaj wpadaja wpisy z wybranego miesiaca -->
+        </div>
+    </div>
+
+    <!-- WIDOK 3: Zakładka Framework's -->
+    <div id="frameworksView" style="display: none;">
+        <div class="grid-layout">
+            <div class="card form-card">
+                <form id="frameworkForm">
+                    <input type="hidden" id="editingFrameworkId" value="">
+                    <div class="form-group">
+                        <label>Zdjecia Framework (Wcisnij Ctrl + V - dowolna ilosc)</label>
+                        <div class="paste-zone" id="fwPasteZone">
+                            Kliknij tutaj, a nastepnie wklej screeny (Ctrl+V)
+                        </div>
+                        <div id="fwPreviewContainer" class="preview-container" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;"></div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" id="fwSubmitBtn" class="btn-primary" style="flex-grow: 1;">Zapisz Framework</button>
+                        <button type="button" id="fwCancelEditBtn" class="btn-secondary" style="display: none;">Anuluj</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="entries-list" id="frameworksList">
+                <!-- Tutaj wpadają kafelki frameworków -->
+            </div>
         </div>
     </div>
 </div>
@@ -86,9 +119,13 @@
     </div>
 </div>
 
-<!-- Modal podgladu zdjecia -->
+<!-- Modal podgladu zdjecia / galerii -->
 <div class="modal" id="imageModal">
-    <img id="modalImg" src="" alt="Powiekszenie wykresu">
+    <div class="modal-content" style="position: relative; max-width: 90%; max-height: 90%; display: flex; flex-direction: column; align-items: center;" onclick="event.stopPropagation()">
+        <button type="button" id="closeModalBtn" style="position: absolute; top: -35px; right: 0; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">x</button>
+        <img id="modalImg" src="" alt="Powiekszenie wykresu" style="max-width: 100%; max-height: 80vh; border-radius: 6px; border: 1px solid var(--border);">
+        <div id="modalGalleryNav" style="display: flex; gap: 10px; margin-top: 15px; overflow-x: auto; max-width: 100%; padding: 5px;"></div>
+    </div>
 </div>
 
 <script src="app.js"></script>
